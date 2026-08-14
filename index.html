@@ -76,11 +76,11 @@
 
   <!-- The Draggable Icons (Starting inside or near the bucket) -->
   <!-- We use 'style="left: ..., top: ..."' to give them their starting locations -->
-  <div class="draggable-icon" style="background-color: #008cba; left: calc(50% - 100px); top: 120px;" id="icon-powerbi">Power BI</div>
-  <div class="draggable-icon" style="background-color: #17a2b8; left: calc(50% - 35px);  top: 120px;" id="icon-powerautomate">Power Automate</div>
-  <div class="draggable-icon" style="background-color: #28a745; left: calc(50% + 30px);  top: 120px;" id="icon-aws">AWS/Oracle</div>
-  <div class="draggable-icon" style="background-color: #ffc107; left: calc(50% - 65px);  top: 200px; color: #333;" id="icon-officesuite">Office Suite</div>
-  <div class="draggable-icon" style="background-color: #dc3545; left: calc(50% + 5px);   top: 200px;" id="icon-powerapps">Power Apps</div>
+  <div class="draggable-icon" style="background-color: #008cba;" id="icon-powerbi">Power BI</div>
+  <div class="draggable-icon" style="background-color: #17a2b8;" id="icon-powerautomate">Power Automate</div>
+  <div class="draggable-icon" style="background-color: #28a745;" id="icon-aws">AWS/Oracle</div>
+  <div class="draggable-icon" style="background-color: #ffc107;" id="icon-officesuite">Office Suite</div>
+  <div class="draggable-icon" style="background-color: #dc3545;" id="icon-powerapps">Power Apps</div>
 </div>
 
 <script>
@@ -150,6 +150,31 @@
     isDragging = false;
     activeIcon = null;
   });
+  // --- RANDOM SCATTER LOGIC ---
+
+function scatterIcons() {
+  const sandbox = document.querySelector('.app-sandbox-area');
+  
+  // Get the actual physical width and height of your expanded sandbox
+  const boxWidth = sandbox.offsetWidth;
+  const boxHeight = sandbox.offsetHeight;
+  
+  icons.forEach(icon => {
+    // Generate random coordinates based on the sandbox size
+    // We subtract 100 from width/height so icons don't spawn off the edge of the screen
+    const randomX = Math.floor(Math.random() * (boxWidth - 100));
+    
+    // We add 180 to the Y coordinate so they spawn below the bucket, not inside it
+    const randomY = Math.floor(Math.random() * (boxHeight - 250)) + 180;
+    
+    // Apply those coordinates directly to the CSS styles
+    icon.style.left = `${randomX}px`;
+    icon.style.top = `${randomY}px`;
+  });
+}
+
+// Run the function as soon as the browser reads the script
+scatterIcons();
 </script>
 <!-- END OF APPLICATION BUCKET PROTOTYPE -->
   </body>
