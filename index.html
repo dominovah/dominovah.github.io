@@ -90,28 +90,32 @@
   let offsetX = 0; 
   let offsetY = 0;
 
-  // 1. SCATTER LOGIC (Runs once when page loads)
-  function scatterIcons() {
-    const sandbox = document.querySelector('.app-sandbox-area');
+// 1. SCATTER LOGIC (Runs once when page loads)
+function scatterIcons() {
+  // We target the small dashed box specifically
+  const bucket = document.querySelector('.app-bucket');
+  
+  // Get exactly where the bucket sits relative to the page
+  const bucketX = bucket.offsetLeft;
+  const bucketY = bucket.offsetTop;
+  
+  // Get the bucket's exact width and height
+  const bucketWidth = bucket.offsetWidth;
+  const bucketHeight = bucket.offsetHeight;
+  
+  icons.forEach(icon => {
+    // Generate random coordinates starting from the bucket's top-left corner.
+    // We subtract 86 (the 70px icon + padding) so they stay inside the dashed lines.
+    const randomX = bucketX + Math.floor(Math.random() * (bucketWidth - 86));
+    const randomY = bucketY + Math.floor(Math.random() * (bucketHeight - 86));
     
-    // Get the boundaries of the sandbox
-    const boxWidth = sandbox.offsetWidth;
-    const boxHeight = sandbox.offsetHeight;
-    
-    icons.forEach(icon => {
-      // Randomize within the sandbox limits. 
-      // The -70 accounts for the width/height of the icon itself so it doesn't hang over the edge.
-      // The +180 on the Y axis keeps them from spawning on top of the App Container bucket.
-      const randomX = Math.floor(Math.random() * (boxWidth - 70));
-      const randomY = Math.floor(Math.random() * (boxHeight - 250)) + 180;
-      
-      icon.style.left = `${randomX}px`;
-      icon.style.top = `${randomY}px`;
-    });
-  }
+    icon.style.left = `${randomX}px`;
+    icon.style.top = `${randomY}px`;
+  });
+}
 
-  // Trigger the scatter immediately
-  scatterIcons();
+// Trigger the scatter immediately
+scatterIcons();
 
   // 2. DRAG LOGIC
   icons.forEach(icon => {
