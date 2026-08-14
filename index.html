@@ -79,102 +79,77 @@
   <div class="draggable-icon" style="background-color: #008cba;" id="icon-powerbi">Power BI</div>
   <div class="draggable-icon" style="background-color: #17a2b8;" id="icon-powerautomate">Power Automate</div>
   <div class="draggable-icon" style="background-color: #28a745;" id="icon-aws">AWS/Oracle</div>
-  <div class="draggable-icon" style="background-color: #ffc107;" id="icon-officesuite">Office Suite</div>
+  <div class="draggable-icon" style="background-color: #ffc107;color: #333;" id="icon-officesuite">Office Suite</div>
   <div class="draggable-icon" style="background-color: #dc3545;" id="icon-powerapps">Power Apps</div>
 </div>
 
 <script>
-  // 1. Find all elements with the 'draggable-icon' class
   const icons = document.querySelectorAll('.draggable-icon');
-
-  // We need variables to keep track of state outside the functions
   let isDragging = false;
   let activeIcon = null;
-  let offsetX = 0; // Click position relative to icon's top-left corner
+  let offsetX = 0; 
   let offsetY = 0;
 
-  // 2. Loop through each icon and add the 'mousedown' (click) listener
+  // 1. SCATTER LOGIC (Runs once when page loads)
+  function scatterIcons() {
+    const sandbox = document.querySelector('.app-sandbox-area');
+    
+    // Get the boundaries of the sandbox
+    const boxWidth = sandbox.offsetWidth;
+    const boxHeight = sandbox.offsetHeight;
+    
+    icons.forEach(icon => {
+      // Randomize within the sandbox limits. 
+      // The -70 accounts for the width/height of the icon itself so it doesn't hang over the edge.
+      // The +180 on the Y axis keeps them from spawning on top of the App Container bucket.
+      const randomX = Math.floor(Math.random() * (boxWidth - 70));
+      const randomY = Math.floor(Math.random() * (boxHeight - 250)) + 180;
+      
+      icon.style.left = `${randomX}px`;
+      icon.style.top = `${randomY}px`;
+    });
+  }
+
+  // Trigger the scatter immediately
+  scatterIcons();
+
+  // 2. DRAG LOGIC
   icons.forEach(icon => {
     icon.addEventListener('mousedown', (e) => {
       isDragging = true;
-      activeIcon = icon; // Store which specific icon we are dragging
-
-      // Calculate the offset so the icon doesn't 'jump' its top-left corner to the cursor
+      activeIcon = icon; 
+      
       const rect = activeIcon.getBoundingClientRect();
       offsetX = e.clientX - rect.left;
       offsetY = e.clientY - rect.top;
-
-      // Add the dragging CSS styling class
+      
       activeIcon.classList.add('dragging');
-
-      // Prevent browser default behaviors (like dragging the element as a plain ghost image)
       e.preventDefault();
     });
   });
 
-  // 3. Listen for global mouse movement and release (on the whole document)
-  // We listen to 'document', not the 'icon', so the drag works smoothly even if you move fast
   document.addEventListener('mousemove', (e) => {
-    if (!isDragging || !activeIcon) return; // Exit if we aren't actively dragging
+    if (!isDragging || !activeIcon) return; 
 
-    // Get the area boundary rect so we can keep icons contained
     const sandboxArea = document.querySelector('.app-sandbox-area').getBoundingClientRect();
 
-    // Calculate the NEW position (Mouse position - offset - sandbox area start)
+    // Calculate the exact position of the mouse relative to the sandbox
     let x = e.clientX - offsetX - sandboxArea.left;
     let y = e.clientY - offsetY - sandboxArea.top;
 
-    // (Optional) Add boundaries so icons don't drag off the screen
-    const minX = 0;
-    const minY = 0;
-    const maxX = sandboxArea.width - activeIcon.offsetWidth;
-    const maxY = sandboxArea.height - activeIcon.offsetHeight;
-
-    // Use Math.min/max to clamp the coordinates within boundaries
-    x = Math.max(minX, Math.min(maxX, x));
-    y = Math.max(minY, Math.min(maxY, y));
-
-    // 4. THE MAGIC: Update the CSS style directly in real-time
-    // The screen will redraw the icon at these new coordinates 60 times per second
+    // Notice we removed the boundary clamps here! 
+    // The icon will now follow the mouse infinitely in any direction.
     activeIcon.style.left = `${x}px`;
     activeIcon.style.top = `${y}px`;
   });
 
   document.addEventListener('mouseup', () => {
     if (activeIcon) {
-      // Remove the dragging CSS class
       activeIcon.classList.remove('dragging');
     }
-
-    // Reset state
     isDragging = false;
     activeIcon = null;
   });
-  // --- RANDOM SCATTER LOGIC ---
-
-function scatterIcons() {
-  const sandbox = document.querySelector('.app-sandbox-area');
-  
-  // Get the actual physical width and height of your expanded sandbox
-  const boxWidth = sandbox.offsetWidth;
-  const boxHeight = sandbox.offsetHeight;
-  
-  icons.forEach(icon => {
-    // Generate random coordinates based on the sandbox size
-    // We subtract 100 from width/height so icons don't spawn off the edge of the screen
-    const randomX = Math.floor(Math.random() * (boxWidth - 100));
-    
-    // We add 180 to the Y coordinate so they spawn below the bucket, not inside it
-    const randomY = Math.floor(Math.random() * (boxHeight - 250)) + 180;
-    
-    // Apply those coordinates directly to the CSS styles
-    icon.style.left = `${randomX}px`;
-    icon.style.top = `${randomY}px`;
-  });
-}
-
-// Run the function as soon as the browser reads the script
-scatterIcons();
 </script>
 <!-- END OF APPLICATION BUCKET PROTOTYPE -->
   </body>
